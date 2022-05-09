@@ -146,12 +146,17 @@ function install_autosuggestion() {
 	sleep 0.5
 }
 
-function autodelete() {
-	echo ""
-	echo "Autodeleteing installer folder..."
-	cd ../
-	rm -rf zsh-kali-autosuggestions-installer
-	echo -e "\e[32mDone.\e[0m"
+# function autodelete() {
+# 	echo ""
+# 	echo "Autodeleteing installer folder..."
+# 	cd ../
+# 	rm -rf zsh-kali-autosuggestions-installer
+# 	echo -e "\e[32mDone.\e[0m"
+# 	echo "You're all set! Enjoy autosuggestion!"
+# 	echo "Thanks for using this installer!"
+# }
+
+function Thanks() {
 	echo "You're all set! Enjoy autosuggestion!"
 	echo "Thanks for using this installer!"
 }
@@ -169,7 +174,8 @@ function main() {
 		sleep 1
 	fi
 	install_autosuggestion
-	autodelete
+	#autodelete
+	Thanks
 }
 
 main $@
