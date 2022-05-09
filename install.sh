@@ -142,7 +142,7 @@ function install_autosuggestion() {
 	sudo cp ~/.zshrc ~/.zshrc.bak
 	sleep 0.5
 	echo "Installing autosuggestion for zsh..."
-	sudo cat resources/zshrc >~/.zshrc
+	sudo cp resources/zshrc ~/.zshrc
 	sleep 0.5
 }
 
