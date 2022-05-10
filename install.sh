@@ -20,6 +20,16 @@ function check_sudo() {
 		echo ""
 		sleep 0.5
 	fi
+	echo "Checking if you running the script in the correct directory..."
+	sleep 0.5
+	if [ ! -f "install.sh" ]; then
+		echo "You need to run the script from the directory where it is located."
+		exit 1
+	else
+		echo -e "\e[32mOK\e[0m"
+		echo ""
+		sleep 0.5
+	fi
 }
 
 function warning() {
@@ -123,38 +133,86 @@ function install_dependencies() {
 	sleep 1
 }
 
+function check_resources() {
+	if [ ! -d "resources" ]; then
+		echo "The resources folder does not exist, pulling from GitHub..."
+		git clone https://github.com/Nysioko/zsh-autosuggestions.git temp
+		if [ ! -d "temp" ]; then
+			echo "Git clone failed, check your internet connection and try again."
+			exit 1
+		fi
+		mv temp/resources resources
+		rm -rf temp
+		echo "Resources folder created."
+		echo ""
+		sleep 1
+	fi
+}
+
 function install_autosuggestion() {
 	echo "Installing Autosuggestion..."
 	sleep 2
 	echo "Installing command-not-found..."
 	sudo cp -r resources/command-not-found /usr/lib
+	if [ $? -ne 0 ]; then
+		echo -e "\e[31mFAIL\e[0m"
+		echo "Failed to install command-not-found."
+		echo "Maybe check your permissions, if the repository is complete and try again."
+		exit 1
+	fi
 	sleep 0.5
 	echo "Installing autosuggestion..."
 	sudo cp -r resources/zsh-autosuggestions /usr/share
+	if [ $? -ne 0 ]; then
+		echo -e "\e[31mFAIL\e[0m"
+		echo "Failed to install autosuggestion."
+		echo "Maybe check your permissions, if the repository is complete and try again."
+		exit 1
+	fi
 	sleep 0.5
 	echo "Installing syntax highlighting..."
 	sudo cp -r resources/zsh-syntax-highlighting /usr/share
+	if [ $? -ne 0 ]; then
+		echo -e "\e[31mFAIL\e[0m"
+		echo "Failed to install syntax highlighting."
+		echo "Maybe check your permissions, if the repository is complete and try again."
+		exit 1
+	fi
 	sleep 0.5
 	echo "Installing command-not-found for zsh..."
 	sudo cp -r resources/zsh_command_not_found /etc/
+	if [ $? -ne 0 ]; then
+		echo -e "\e[31mFAIL\e[0m"
+		echo "Failed to install command-not-found for zsh."
+		echo "Maybe check your permissions, if the repository is complete and try again."
+		exit 1
+	fi
 	sleep 0.5
-	echo "Backuping your current zshrc..."
-	sudo cp ~/.zshrc ~/.zshrc.bak
+	if [ -f ~/.zshrc ]; then
+		echo "Found .zshrc, backing up to .zshrc.bak..."
+		username=$(whoami)
+		mv ~/.zshrc ~/.zshrc.bak
+		if [ $? -ne 0 ]; then
+			echo -e "\e[31mFAIL\e[0m"
+			echo "Failed to backup .zshrc."
+			echo "Maybe check your permissions, if the repository is complete and try again."
+			exit 1
+		fi
+	else
+		echo "No .zshrc found, passing..."
+	fi
 	sleep 0.5
 	echo "Installing autosuggestion for zsh..."
-	sudo cp resources/zshrc ~/.zshrc
+	username=$(whoami)
+	sudo cp resources/.zshrc ~/.zshrc
+	if [ $? -ne 0 ]; then
+		echo -e "\e[31mFAIL\e[0m"
+		echo "Failed to install autosuggestion for zsh."
+		echo "Maybe check your permissions, if the repository is complete and try again."
+		exit 1
+	fi
 	sleep 0.5
 }
-
-# function autodelete() {
-# 	echo ""
-# 	echo "Autodeleteing installer folder..."
-# 	cd ../
-# 	rm -rf zsh-kali-autosuggestions-installer
-# 	echo -e "\e[32mDone.\e[0m"
-# 	echo "You're all set! Enjoy autosuggestion!"
-# 	echo "Thanks for using this installer!"
-# }
 
 function Thanks() {
 	echo "You're all set! Enjoy autosuggestion!"
@@ -169,12 +227,12 @@ function main() {
 	if [ "$is_installed" = false ]; then
 		install_dependencies
 	else
-		echo "All dependencies are already installed."
+		echo "All dependencies are already installed, skipping..."
 		echo ""
 		sleep 1
 	fi
+	check_resources
 	install_autosuggestion
-	#autodelete
 	Thanks
 }
 
