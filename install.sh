@@ -149,6 +149,11 @@ function check_resources() {
 	fi
 }
 
+function get_username() {
+	pwd_user=$(pwd)
+	username=$(echo $pwd_user | cut -d "/" -f3)
+}
+
 function install_autosuggestion() {
 	echo "Installing Autosuggestion..."
 	sleep 2
@@ -188,10 +193,10 @@ function install_autosuggestion() {
 		exit 1
 	fi
 	sleep 0.5
+	get_username
 	if [ -f ~/.zshrc ]; then
 		echo "Found .zshrc, backing up to .zshrc.bak..."
-		username=$(whoami)
-		mv ~/.zshrc ~/.zshrc.bak
+		mv /home/$username/.zshrc /home/$username/.zshrc.bak
 		if [ $? -ne 0 ]; then
 			echo -e "\e[31mFAIL\e[0m"
 			echo "Failed to backup .zshrc."
@@ -203,8 +208,7 @@ function install_autosuggestion() {
 	fi
 	sleep 0.5
 	echo "Installing autosuggestion for zsh..."
-	username=$(whoami)
-	sudo cp resources/.zshrc ~/.zshrc
+	sudo cp resources/.zshrc /home/$username/.zshrc
 	if [ $? -ne 0 ]; then
 		echo -e "\e[31mFAIL\e[0m"
 		echo "Failed to install autosuggestion for zsh."
